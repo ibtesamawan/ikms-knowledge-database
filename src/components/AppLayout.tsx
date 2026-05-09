@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, type ReactNode } from "react";
 import { Search, LayoutDashboard, Upload, Database } from "lucide-react";
 import { CATEGORIES, DEPARTMENTS, type Category, type Department } from "@/lib/ikms-store";
@@ -18,12 +18,12 @@ interface Props {
 
 export function AppLayout({ children, filters, onFiltersChange, showFilters = true }: Props) {
   const navigate = useNavigate();
-  const path = useRouterState({ select: (s) => s.location.pathname });
+  const { pathname } = useLocation();
   const [query, setQuery] = useState("");
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: "/search", search: { q: query } });
+    navigate(`/search?q=${encodeURIComponent(query)}`);
   };
 
   const toggle = <T extends string>(set: Set<T>, val: T): Set<T> => {
@@ -55,10 +55,10 @@ export function AppLayout({ children, filters, onFiltersChange, showFilters = tr
             </button>
           </form>
           <nav className="flex items-center gap-1 shrink-0">
-            <Link to="/" className={`px-3 h-10 inline-flex items-center gap-2 rounded-md text-sm font-medium ${path === "/" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted"}`}>
+            <Link to="/" className={`px-3 h-10 inline-flex items-center gap-2 rounded-md text-sm font-medium ${pathname === "/" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted"}`}>
               <LayoutDashboard className="h-4 w-4" /> Dashboard
             </Link>
-            <Link to="/upload" className={`px-3 h-10 inline-flex items-center gap-2 rounded-md text-sm font-medium ${path === "/upload" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted"}`}>
+            <Link to="/upload" className={`px-3 h-10 inline-flex items-center gap-2 rounded-md text-sm font-medium ${pathname === "/upload" ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted"}`}>
               <Upload className="h-4 w-4" /> Upload
             </Link>
           </nav>
