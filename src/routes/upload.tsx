@@ -1,10 +1,20 @@
-import { useNavigate } from "react-router-dom";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { AppLayout, type FilterState } from "@/components/AppLayout";
 import { addDoc, CATEGORIES, DEPARTMENTS, type Category, type Department } from "@/lib/ikms-store";
 
-export default function UploadPage() {
+export const Route = createFileRoute("/upload")({
+  head: () => ({
+    meta: [
+      { title: "Upload Document — IKMS" },
+      { name: "description", content: "Add a new document to the knowledge base." },
+    ],
+  }),
+  component: UploadPage,
+});
+
+function UploadPage() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<FilterState>({ categories: new Set(), departments: new Set() });
   const [title, setTitle] = useState("");
@@ -12,38 +22,22 @@ export default function UploadPage() {
   const [department, setDepartment] = useState<Department>("HR");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
-  const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
   const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("category", category);
-      formData.append("department", department);
-      formData.append("description", description);
-      formData.append("tags", tags);
-      if (file) formData.append("file", file);
-
-      await addDoc(formData);
-
-      setSuccess(true);
-      setTitle("");
-      setDescription("");
-      setTags("");
-      setFileName("");
-      setFile(null);
-
-      setTimeout(() => navigate("/"), 1500);
-    } catch (err) {
-      console.error("Upload failed:", err);
-    } finally {
-      setLoading(false);
-    }
+    const doc = addDoc({
+      title,
+      category,
+      department,
+      description,
+      tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
+      fileName,
+    });
+    setSuccess(true);
+    setTitle(""); setDescription(""); setTags(""); setFileName("");
+    setTimeout(() => navigate({ to: "/document/$id", params: { id: doc.id } }), 1200);
   };
 
   const inputCls = "w-full h-10 px-3 rounded-md border border-input bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/40";
@@ -89,9 +83,7 @@ export default function UploadPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-1.5">
-              Tags <span className="text-muted-foreground font-normal">(comma separated)</span>
-            </label>
+            <label className="block text-sm font-semibold mb-1.5">Tags <span className="text-muted-foreground font-normal">(comma separated)</span></label>
             <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="e.g. onboarding, security" className={inputCls} />
           </div>
 
@@ -103,17 +95,13 @@ export default function UploadPage() {
               </span>
               <span className="text-sm text-muted-foreground">{fileName || "PDF, DOCX, TXT only"}</span>
               <input type="file" accept=".pdf,.docx,.txt" className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) { setFile(f); setFileName(f.name); }
-                }} />
+                onChange={(e) => setFileName(e.target.files?.[0]?.name || "")} />
             </label>
           </div>
 
           <div className="pt-2">
-            <button type="submit" disabled={loading}
-              className="h-11 px-8 rounded-md bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition disabled:opacity-50">
-              {loading ? "Uploading..." : "Submit Document"}
+            <button type="submit" className="h-11 px-8 rounded-md bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition">
+              Submit Document
             </button>
           </div>
         </form>
