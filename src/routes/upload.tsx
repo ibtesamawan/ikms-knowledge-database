@@ -1,20 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { AppLayout, type FilterState } from "@/components/AppLayout";
 import { addDoc, CATEGORIES, DEPARTMENTS, type Category, type Department } from "@/lib/ikms-store";
 
-export const Route = createFileRoute("/upload")({
-  head: () => ({
-    meta: [
-      { title: "Upload Document — IKMS" },
-      { name: "description", content: "Add a new document to the knowledge base." },
-    ],
-  }),
-  component: UploadPage,
-});
-
-function UploadPage() {
+export default function UploadPage() {
+  useEffect(() => { document.title = "Upload Document — IKMS"; }, []);
   const navigate = useNavigate();
   const [filters, setFilters] = useState<FilterState>({ categories: new Set(), departments: new Set() });
   const [title, setTitle] = useState("");
@@ -37,7 +28,7 @@ function UploadPage() {
     });
     setSuccess(true);
     setTitle(""); setDescription(""); setTags(""); setFileName("");
-    setTimeout(() => navigate({ to: "/document/$id", params: { id: doc.id } }), 1200);
+    setTimeout(() => navigate(`/document/${doc.id}`), 1200);
   };
 
   const inputCls = "w-full h-10 px-3 rounded-md border border-input bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/40";

@@ -1,21 +1,11 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { ArrowLeft, Download, Pencil, Calendar, User } from "lucide-react";
 import { AppLayout, Tag, type FilterState } from "@/components/AppLayout";
 import { getDoc } from "@/lib/ikms-store";
 
-export const Route = createFileRoute("/document/$id")({
-  component: DocDetail,
-  notFoundComponent: () => (
-    <div className="p-12 text-center">
-      <h1 className="text-2xl font-bold mb-2">Document not found</h1>
-      <Link to="/" className="text-primary hover:underline">Back to dashboard</Link>
-    </div>
-  ),
-});
-
-function DocDetail() {
-  const { id } = Route.useParams();
+export default function DocDetail() {
+  const { id = "" } = useParams();
   const navigate = useNavigate();
   const doc = getDoc(id);
   const [filters, setFilters] = useState<FilterState>({ categories: new Set(), departments: new Set() });
@@ -35,7 +25,7 @@ function DocDetail() {
     <AppLayout filters={filters} onFiltersChange={setFilters}>
       <div className="max-w-3xl mx-auto">
         <button
-          onClick={() => navigate({ to: "/" })}
+          onClick={() => navigate("/")}
           className="inline-flex items-center gap-2 text-primary font-semibold mb-6 hover:underline"
         >
           <ArrowLeft className="h-4 w-4" /> Back
