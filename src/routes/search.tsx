@@ -1,20 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { z } from "zod";
+import { Link, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { SearchX } from "lucide-react";
 import { AppLayout, Tag, type FilterState } from "@/components/AppLayout";
 import { useDocs } from "@/lib/ikms-store";
 
-const searchSchema = z.object({ q: z.string().optional().default("") });
-
-export const Route = createFileRoute("/search")({
-  validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Search — IKMS" }] }),
-  component: SearchPage,
-});
-
-function SearchPage() {
-  const { q } = Route.useSearch();
+export default function SearchPage() {
+  useEffect(() => { document.title = "Search — IKMS"; }, []);
+  const [params] = useSearchParams();
+  const q = params.get("q") ?? "";
   const docs = useDocs();
   const [filters, setFilters] = useState<FilterState>({ categories: new Set(), departments: new Set() });
 
@@ -59,8 +52,7 @@ function SearchPage() {
               </div>
               <p className="text-sm text-muted-foreground flex-1 mb-4">{d.description}</p>
               <Link
-                to="/document/$id"
-                params={{ id: d.id }}
+                to={`/document/${d.id}`}
                 className="inline-flex items-center justify-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition self-start"
               >
                 View Details

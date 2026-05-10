@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, type ReactNode } from "react";
 import { Search, LayoutDashboard, Upload, Database } from "lucide-react";
 import { CATEGORIES, DEPARTMENTS, type Category, type Department } from "@/lib/ikms-store";
@@ -18,12 +18,12 @@ interface Props {
 
 export function AppLayout({ children, filters, onFiltersChange, showFilters = true }: Props) {
   const navigate = useNavigate();
-  const path = useRouterState({ select: (s) => s.location.pathname });
+  const path = useLocation().pathname;
   const [query, setQuery] = useState("");
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: "/search", search: { q: query } });
+    navigate(`/search?q=${encodeURIComponent(query)}`);
   };
 
   const toggle = <T extends string>(set: Set<T>, val: T): Set<T> => {

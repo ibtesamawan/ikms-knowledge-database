@@ -1,19 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { AppLayout, Tag, type FilterState } from "@/components/AppLayout";
 import { useDocs, CATEGORIES, type Category } from "@/lib/ikms-store";
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Dashboard — IKMS Knowledge Database" },
-      { name: "description", content: "Browse and filter organizational knowledge across departments." },
-    ],
-  }),
-  component: Dashboard,
-});
-
-function Dashboard() {
+export default function Dashboard() {
+  useEffect(() => { document.title = "Dashboard — IKMS Knowledge Database"; }, []);
   const docs = useDocs();
   const [filters, setFilters] = useState<FilterState>({ categories: new Set(), departments: new Set() });
 
@@ -59,8 +50,7 @@ function Dashboard() {
                   </div>
                   <p className="text-sm text-muted-foreground flex-1 mb-4">{d.description}</p>
                   <Link
-                    to="/document/$id"
-                    params={{ id: d.id }}
+                    to={`/document/${d.id}`}
                     className="inline-flex items-center justify-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition self-start"
                   >
                     View Details
