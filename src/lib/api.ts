@@ -1,5 +1,4 @@
 const API_URL = 'https://ikms-backend-memvhc14t-ibtesam-s-project.vercel.app/api';
-
 export const api = {
   // Get all documents
   getDocuments: async (
